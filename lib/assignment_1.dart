@@ -37,6 +37,23 @@ abstract class BankAccount{
     print("Holder Name: $_holderName");
     print("Balance: $_balance");
   }
+
+  List<String> _transaction= [];
+  
+  void addTransaction(String transaction) {
+    _transaction.add('[${DateTime.now()}] $transaction');
+  }
+
+  void displayTransactionHistory() {
+    print("\nTransaction history for $_accountNumber :");
+    if (_transaction.isEmpty) {
+      print("No transactions yet.");
+    } else {
+      for (var t in _transaction) {
+        print("- $t");
+      }
+    }
+  }
 }
 
 // SavingsAccount class extending BankAccount
@@ -60,12 +77,14 @@ class SavingsAccount extends BankAccount implements InterestBearing{
     balance -= amount;
     _withdrawalCount++;
     print("Withdrawal of $amount successful. New balance: $balance");
+    addTransaction('Withdraw -$amount');
   }
 
   @override
   void deposit(double amount) {
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");
+    addTransaction( 'Deposit +$amount');
   }
 
   @override
@@ -73,6 +92,7 @@ class SavingsAccount extends BankAccount implements InterestBearing{
     double interest = balance * _interestRate;
     balance += interest;
     print("Interest of $interest applied. New balance: $balance");
+    addTransaction('Interest applied +$interest');
   }
 }
 
@@ -93,12 +113,14 @@ class CheckingAccount extends BankAccount{
       balance = newBalance;
       print("Withdrawal of $amount successful. New balance: $balance");
     }
+    addTransaction('Withdraw -$amount');
   }
 
   @override
   void deposit(double amount) {
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");
+    addTransaction('Deposit +$amount');
   }  
 
 }
@@ -117,13 +139,15 @@ class PremiumAccount extends BankAccount implements InterestBearing{
       return;       
     }
     balance -= amount;
-    print("Withdrawal of $amount successful. New balance: $balance");   
+    print("Withdrawal of $amount successful. New balance: $balance");  
+    addTransaction('Withdraw -$amount'); 
   }
 
   @override
   void deposit(double amount) {
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");  
+    addTransaction('Deposit +$amount');
   }
 
   @override
@@ -131,6 +155,7 @@ class PremiumAccount extends BankAccount implements InterestBearing{
     double interest = balance * _interestRate;
     balance += interest;
     print("Interest of $interest applied. New balance: $balance");
+    addTransaction('Interest applied +$interest');
   }
 }
 
@@ -143,7 +168,7 @@ class Bank{
 
   void addAccount(BankAccount account){
     _accounts.add(account);
-    print("Account added: ${account.accountNumber}");
+    print("Account ${account.accountNumber} created for ${account.holderName}.");
   }
 
   void findAccount(int accountNumber){
@@ -179,6 +204,7 @@ class Bank{
   }
 
   void applymonthlyInterest(){
+    print("\nApplying monthly interest to all interest-bearing accounts...");
     for(var account in _accounts){
       if(account is InterestBearing){
         (account as InterestBearing).applyInterest();
@@ -186,18 +212,14 @@ class Bank{
     }
   }
 
-  List <String> transactionHistory = [];
-  
-  void recordTransaction(String transaction){
-    transactionHistory.add("${DateTime.now()}: $transaction");
-  }
-
-  void displayTransactionHistory(){
-    print("Transaction History:");
-    for(var transaction in transactionHistory){
-      print(transaction);
+   void displayAllAccounts() {
+    print( "\nAll Bank Accounts:");
+    for (var acc in _accounts) {
+      print('Account Number: ${acc.accountNumber}, Holder Name: ${acc.holderName}, Balance: ${acc.balance}');
     }
   }
+
+  
 }
 
 class StudentAccount extends BankAccount {
@@ -213,6 +235,7 @@ class StudentAccount extends BankAccount {
     }
     balance -= amount;
     print("Withdrawal of $amount successful. New balance: $balance");
+    addTransaction('Withdraw -$amount');
   }
 
   @override
@@ -223,6 +246,7 @@ class StudentAccount extends BankAccount {
     }
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");
+    addTransaction('Deposit +$amount');
   }
 }
 
@@ -233,19 +257,37 @@ void main(){
   SavingsAccount savingsAccount = SavingsAccount(1001, "Alice", 1000.0);
   CheckingAccount checkingAccount = CheckingAccount(1002, "Bob", 500.0);
   PremiumAccount premiumAccount = PremiumAccount(1003, "Charlie", 11000.0);
+  StudentAccount studentAccount = StudentAccount(1004, "David", 2000.0);
 
   bank.addAccount(savingsAccount);
   bank.addAccount(checkingAccount);
   bank.addAccount(premiumAccount);
+  bank.addAccount(studentAccount);
 
+  print("\nPerforming transactions for saving accounts:");
   savingsAccount.deposit(100.0);
   savingsAccount.withdraw(300.0);
 
+  print("\nPerforming transactions for checking accounts:");
   checkingAccount.deposit(150.0);
   checkingAccount.withdraw(700.0);
 
+  print("\nPerforming transactions for premium accounts:");
   premiumAccount.deposit(4000.0);
   premiumAccount.withdraw(3000.0);
 
+  print("\nPerforming transactions for student accounts:");
+  studentAccount.deposit(2500.0);
+  studentAccount.withdraw(1000.0);  
+
   bank.applymonthlyInterest();
+
+  print("\nTransferring money from savings account to checking account:");
+  bank.transferMoney(1001, 1002, 200);
+  
+  savingsAccount.displayTransactionHistory();
+  premiumAccount.displayTransactionHistory();
+  checkingAccount.displayTransactionHistory();
+  studentAccount.displayTransactionHistory();
+  bank.displayAllAccounts();
 }
