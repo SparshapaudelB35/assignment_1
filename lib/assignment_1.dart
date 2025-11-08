@@ -61,11 +61,13 @@ class SavingsAccount extends BankAccount implements InterestBearing{
     _withdrawalCount++;
     print("Withdrawal of $amount successful. New balance: $balance");
   }
+
   @override
   void deposit(double amount) {
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");
   }
+
   @override
   void applyInterest(){
     double interest = balance * _interestRate;
@@ -105,7 +107,9 @@ class CheckingAccount extends BankAccount{
 class PremiumAccount extends BankAccount implements InterestBearing{
   static const double _minimumBalance = 10000.0;
   static const double _interestRate = 0.05;
+
   PremiumAccount(super.accountNumber, super.holderName, super.balance);
+
   @override
   void withdraw(double amount) {
     if(balance - amount < _minimumBalance){
@@ -115,11 +119,13 @@ class PremiumAccount extends BankAccount implements InterestBearing{
     balance -= amount;
     print("Withdrawal of $amount successful. New balance: $balance");   
   }
+
   @override
   void deposit(double amount) {
     balance += amount;
     print("Deposit of $amount successful. New balance: $balance");  
   }
+
   @override
   void applyInterest(){
     double interest = balance * _interestRate;
@@ -139,6 +145,7 @@ class Bank{
     _accounts.add(account);
     print("Account added: ${account.accountNumber}");
   }
+
   void findAccount(int accountNumber){
     for(var account in _accounts){
       if(account.accountNumber == accountNumber){
@@ -166,7 +173,6 @@ class Bank{
       print("One or both accounts not found.");
       return;
     }
-
     fromAccount.withdraw(amount);
     toAccount.deposit(amount);
     print("Transfer of $amount from account $fromAccountNumber to account $toAccountNumber completed.");
@@ -181,9 +187,11 @@ class Bank{
   }
 
   List <String> transactionHistory = [];
+  
   void recordTransaction(String transaction){
     transactionHistory.add("${DateTime.now()}: $transaction");
   }
+
   void displayTransactionHistory(){
     print("Transaction History:");
     for(var transaction in transactionHistory){
